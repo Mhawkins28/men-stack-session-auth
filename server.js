@@ -3,6 +3,7 @@ const dotenv = require("dotenv")
 const mongoose = require("mongoose")
 const methodOverride = require("method-override")
 const morgan = require("morgan")
+const session = require("express-session")
 
 const port = process.env.PORT ? process.env.PORT : "4000"
 
@@ -23,12 +24,22 @@ app.use(express.urlencoded({extended: false}))
 app.use(methodOverride("_method"))
 app.use(morgan("dev"))
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+    })
+)
+
 app.use("/auth", authCtrl)
 
 //Routes
 app.get("/", (req, res)=> {
     // res.send("This is the root of the app")
-    res.render("index.ejs")
+    res.render("index.ejs", {
+        user: req.session.user
+    })
 })
 
 
